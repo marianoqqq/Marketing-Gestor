@@ -47,6 +47,11 @@ public class UserEntity implements UserDetails {
     @Column(name = "refresh_token", length = 2048, unique = true)
     private String refreshToken;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "inmobiliaria_id")
+    @ToString.Exclude
+    private InmobiliariaEntity inmobiliaria;
+
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
