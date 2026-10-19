@@ -35,3 +35,6 @@ build/
 ### Local secrets ###
 **/src/main/resources/application-local.properties
 .env
+
+### H2 local ###
+data/
