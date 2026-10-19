@@ -1,0 +1,81 @@
+package com.example.demo.service;
+
+import com.example.demo.dto.request.AuthRequest;
+import com.example.demo.dto.request.RegisterRequest;
+import com.example.demo.dto.response.AuthResponse;
+import com.example.demo.enums.UserStatus;
+import com.example.demo.model.UserEntity;
+import com.example.demo.repository.UserRepository;
+import com.example.demo.securityJwt.JwtService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@RequiredArgsConstructor
+@Service
+public class AuthService {
+
+    private final UserRepository userRepository;
+    private final AuthenticationManager authenticationManager;
+    private final JwtService jwtService;
+    private final PasswordEncoder passwordEncoder;
+
+    @Transactional
+    public void register(RegisterRequest request) {
+        if (userRepository.findUserEntityByEmail(request.email()).isPresent()) {
+            throw new IllegalArgumentException("El email ya está registrado");
+        }
+
+        UserEntity user = UserEntity.builder()
+                .email(request.email())
+                .password(passwordEncoder.encode(request.password()))
+                .role(request.role())
+                .status(UserStatus.ACTIVE)
+                .build();
+
+
+        userRepository.save(user);
+    }
+
+    public UserDetails authenticate(AuthRequest input) {
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        input.getEmail(),
+                        input.getPassword()
+                )
+        );
+
+        return userRepository.findUserEntityByEmail(input.getEmail())
+                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado con el email: " + input.getEmail()));
+    }
+
+    @Transactional
+    public AuthResponse refreshAccessToken(String refreshToken) {
+        String username = jwtService.extractUsername(refreshToken);
+
+        UserEntity user = userRepository.findUserEntityByEmail(username)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        if (user.getRefreshToken() == null || !user.getRefreshToken().equals(refreshToken)) {
+            throw new IllegalArgumentException("Refresh token does not match");
+        }
+
+        if (!jwtService.isTokenValid(refreshToken, user)) {
+            throw new IllegalArgumentException("Refresh token expired or invalid");
+        }
+
+        String newAccessToken = jwtService.generateToken(user);
+        String newRefreshToken = jwtService.generateRefreshToken(user);
+
+        user.setRefreshToken(newRefreshToken);
+        userRepository.save(user);
+
+        return new AuthResponse(newAccessToken, newRefreshToken);
+    }
+
+}
