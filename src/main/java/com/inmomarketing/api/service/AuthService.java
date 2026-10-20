@@ -15,6 +15,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.inmomarketing.api.enums.UserRole;
+import com.inmomarketing.api.model.InmobiliariaEntity;
+import com.inmomarketing.api.repository.InmobiliariaRepository;
 
 @RequiredArgsConstructor
 @Service
@@ -24,6 +27,7 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
+    private final InmobiliariaRepository inmobiliariaRepository;
 
     @Transactional
     public void register(RegisterRequest request) {
@@ -31,17 +35,21 @@ public class AuthService {
             throw new IllegalArgumentException("El email ya está registrado");
         }
 
+        InmobiliariaEntity inmobiliaria = new InmobiliariaEntity();
+        inmobiliaria.setNombre(request.nombreInmobiliaria());
+        inmobiliariaRepository.save(inmobiliaria);
+
         UserEntity user = UserEntity.builder()
+                .nombre(request.nombre())
                 .email(request.email())
                 .password(passwordEncoder.encode(request.password()))
-                .role(request.role())
+                .role(UserRole.ROLE_USER)
                 .status(UserStatus.ACTIVE)
+                .inmobiliaria(inmobiliaria)
                 .build();
-
 
         userRepository.save(user);
     }
-
     public UserDetails authenticate(AuthRequest input) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
