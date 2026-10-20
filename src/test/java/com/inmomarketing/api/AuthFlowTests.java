@@ -20,47 +20,60 @@ class AuthFlowTests {
 	@Autowired
 	private MockMvc mockMvc;
 
-	@Test
-	void registerLoginAndAccessProtectedEndpoint() throws Exception {
+	private void registrar(String email) throws Exception {
 		mockMvc.perform(post("/auth/register")
 						.contentType(MediaType.APPLICATION_JSON)
 						.content("""
-								{"email":"admin@test.com","password":"secret123","role":"ROLE_ADMIN"}"""))
+								{"nombre":"Ana","email":"%s","password":"secret123","nombreInmobiliaria":"Inmo Test"}"""
+								.formatted(email)))
 				.andExpect(status().isCreated());
+	}
 
+	private String loginToken(String email) throws Exception {
 		String body = mockMvc.perform(post("/auth")
 						.contentType(MediaType.APPLICATION_JSON)
 						.content("""
-								{"email":"admin@test.com","password":"secret123"}"""))
+								{"email":"%s","password":"secret123"}""".formatted(email)))
 				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.accessToken").isNotEmpty())
-				.andExpect(jsonPath("$.refreshToken").isNotEmpty())
 				.andReturn().getResponse().getContentAsString();
-		String accessToken = JsonPath.read(body, "$.accessToken");
+		return JsonPath.read(body, "$.accessToken");
+	}
 
-		mockMvc.perform(get("/api/users").header("Authorization", "Bearer " + accessToken))
+	@Test
+	void registroCreaInmobiliariaYPermiteUsarLaApi() throws Exception {
+		registrar("ana@test.com");
+		String token = loginToken("ana@test.com");
+
+		mockMvc.perform(get("/api/inmobiliaria").header("Authorization", "Bearer " + token))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.nombre").value("Inmo Test"));
+
+		mockMvc.perform(get("/api/propiedades").header("Authorization", "Bearer " + token))
 				.andExpect(status().isOk());
 	}
 
 	@Test
-	void protectedEndpointWithoutTokenReturns401() throws Exception {
-		mockMvc.perform(get("/api/users"))
+	void usuarioNoPuedeEntrarAEndpointsDeAdmin() throws Exception {
+		registrar("user@test.com");
+		String token = loginToken("user@test.com");
+
+		mockMvc.perform(get("/api/users").header("Authorization", "Bearer " + token))
+				.andExpect(status().isForbidden());
+	}
+
+	@Test
+	void sinTokenDevuelve401() throws Exception {
+		mockMvc.perform(get("/api/propiedades"))
 				.andExpect(status().isUnauthorized());
 	}
 
 	@Test
-	void loginWithWrongPasswordReturns401() throws Exception {
-		mockMvc.perform(post("/auth/register")
-						.contentType(MediaType.APPLICATION_JSON)
-						.content("""
-								{"email":"user@test.com","password":"secret123","role":"ROLE_USER"}"""))
-				.andExpect(status().isCreated());
-
+	void passwordIncorrectaDevuelve401() throws Exception {
+		registrar("mal@test.com");
 		mockMvc.perform(post("/auth")
 						.contentType(MediaType.APPLICATION_JSON)
 						.content("""
-								{"email":"user@test.com","password":"wrong"}"""))
+								{"email":"mal@test.com","password":"incorrecta"}"""))
 				.andExpect(status().isUnauthorized());
 	}
-
 }
