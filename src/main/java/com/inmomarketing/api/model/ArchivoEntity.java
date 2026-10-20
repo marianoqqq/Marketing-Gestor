@@ -20,7 +20,7 @@ public class ArchivoEntity {
     private Long id;
 
     @Column(nullable = false, length = 255)
-    private String nombreGuardado;
+    private String ruta;
 
     @Column(length = 255)
     private String nombreOriginal;
