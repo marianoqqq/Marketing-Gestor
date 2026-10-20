@@ -1,5 +1,6 @@
 package com.inmomarketing.api.exception;
 
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -13,6 +14,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import java.time.LocalDateTime;
 import java.util.stream.Collectors;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -97,6 +99,16 @@ public class GlobalExceptionHandler {
         return new ErrorResponse(
                 HttpStatus.UNAUTHORIZED.value(),
                 "Credenciales inválidas",
+                LocalDateTime.now()
+        );
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    @ResponseStatus(HttpStatus.PAYLOAD_TOO_LARGE)
+    public ErrorResponse handleMaxUploadSize(MaxUploadSizeExceededException ex) {
+        return new ErrorResponse(
+                HttpStatus.PAYLOAD_TOO_LARGE.value(),
+                "El archivo supera el tamaño máximo permitido (5 MB por foto)",
                 LocalDateTime.now()
         );
     }
