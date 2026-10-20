@@ -27,6 +27,9 @@ public class UserEntity implements UserDetails {
     @EqualsAndHashCode.Include
     private Long id;
 
+    @Column(length = 100)
+    private String nombre;
+
     @Column(nullable = false, unique = true, length = 100)
     private String email;
 
