@@ -7,6 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -26,4 +28,6 @@ public class PublicacionRequest {
     private String textoImagen;
 
     private String estiloImagen;
+
+    private List<Long> fotoIds;
 }

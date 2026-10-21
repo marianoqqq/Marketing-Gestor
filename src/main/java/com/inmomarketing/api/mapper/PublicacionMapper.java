@@ -2,6 +2,7 @@ package com.inmomarketing.api.mapper;
 
 import com.inmomarketing.api.dto.request.PublicacionRequest;
 import com.inmomarketing.api.dto.response.PublicacionResponse;
+import com.inmomarketing.api.model.ArchivoEntity;
 import com.inmomarketing.api.model.PublicacionEntity;
 import org.springframework.stereotype.Component;
 
@@ -36,7 +37,8 @@ public class PublicacionMapper {
                 entity.getTextoImagen(),
                 entity.getEstiloImagen(),
                 entity.getEstado(),
-                entity.getPublicadaEn()
+                entity.getPublicadaEn(),
+                entity.getFotos().stream().map(ArchivoEntity::getId).toList()
         );
     }
 }

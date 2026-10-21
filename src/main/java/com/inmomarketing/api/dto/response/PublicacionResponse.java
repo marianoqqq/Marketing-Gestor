@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -25,4 +26,5 @@ public class PublicacionResponse {
     private String estiloImagen;
     private EstadoPublicacion estado;
     private LocalDateTime publicadaEn;
+    private List<Long> fotoIds;
 }

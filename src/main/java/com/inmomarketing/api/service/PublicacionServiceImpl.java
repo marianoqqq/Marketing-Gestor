@@ -6,10 +6,12 @@ import com.inmomarketing.api.dto.response.SugerenciaTextoResponse;
 import com.inmomarketing.api.enums.EstadoPublicacion;
 import com.inmomarketing.api.exception.ResourceNotFoundException;
 import com.inmomarketing.api.mapper.PublicacionMapper;
+import com.inmomarketing.api.model.ArchivoEntity;
 import com.inmomarketing.api.model.InmobiliariaEntity;
 import com.inmomarketing.api.model.PropiedadEntity;
 import com.inmomarketing.api.model.PublicacionEntity;
 import com.inmomarketing.api.model.UserEntity;
+import com.inmomarketing.api.repository.ArchivoRepository;
 import com.inmomarketing.api.repository.PropiedadRepository;
 import com.inmomarketing.api.repository.PublicacionRepository;
 import com.inmomarketing.api.repository.UserRepository;
@@ -27,6 +29,7 @@ public class PublicacionServiceImpl implements PublicacionService {
 
     private final PublicacionRepository publicacionRepository;
     private final PropiedadRepository propiedadRepository;
+    private final ArchivoRepository archivoRepository;
     private final UserRepository userRepository;
     private final PublicacionMapper publicacionMapper;
     private final ChatModel chatModel;
@@ -41,6 +44,14 @@ public class PublicacionServiceImpl implements PublicacionService {
         PublicacionEntity publicacion = publicacionMapper.toEntity(request);
         publicacion.setPropiedad(propiedad);
         publicacion.setEstado(EstadoPublicacion.BORRADOR);
+
+        if (request.getFotoIds() != null && !request.getFotoIds().isEmpty()) {
+            List<ArchivoEntity> fotos = archivoRepository.findByIdInAndPropiedadId(request.getFotoIds(), propiedad.getId());
+            if (fotos.size() != request.getFotoIds().size()) {
+                throw new IllegalArgumentException("Alguna de las fotos no existe o no pertenece a la propiedad");
+            }
+            publicacion.setFotos(fotos);
+        }
 
         PublicacionEntity saved = publicacionRepository.save(publicacion);
         return publicacionMapper.toResponse(saved);
