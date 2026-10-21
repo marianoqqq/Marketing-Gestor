@@ -7,6 +7,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "publicaciones")
@@ -54,6 +56,14 @@ public class PublicacionEntity {
     @JoinColumn(name = "propiedad_id", nullable = false)
     @ToString.Exclude
     private PropiedadEntity propiedad;
+
+    @ManyToMany
+    @JoinTable(name = "publicacion_fotos",
+            joinColumns = @JoinColumn(name = "publicacion_id"),
+            inverseJoinColumns = @JoinColumn(name = "archivo_id"))
+    @ToString.Exclude
+    @Builder.Default
+    private List<ArchivoEntity> fotos = new ArrayList<>();
 
     @PrePersist
     protected void onCreate() {

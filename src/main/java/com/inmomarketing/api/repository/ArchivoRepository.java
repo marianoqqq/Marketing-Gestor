@@ -12,4 +12,5 @@ import java.util.Optional;
 public interface ArchivoRepository extends JpaRepository<ArchivoEntity, Long> {
     List<ArchivoEntity> findByPropiedadIdAndTipo(Long propiedadId, TipoArchivo tipo);
     Optional<ArchivoEntity> findByIdAndPropiedadInmobiliariaId(Long id, Long inmobiliariaId);
+    List<ArchivoEntity> findByIdInAndPropiedadId(List<Long> ids, Long propiedadId);
 }
