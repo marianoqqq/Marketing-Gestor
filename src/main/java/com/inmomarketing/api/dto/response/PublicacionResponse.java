@@ -27,4 +27,5 @@ public class PublicacionResponse {
     private EstadoPublicacion estado;
     private LocalDateTime publicadaEn;
     private List<Long> fotoIds;
+    private Long imagenGeneradaId;
 }

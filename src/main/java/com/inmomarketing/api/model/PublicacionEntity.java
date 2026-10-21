@@ -57,6 +57,11 @@ public class PublicacionEntity {
     @ToString.Exclude
     private PropiedadEntity propiedad;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "imagen_generada_id")
+    @ToString.Exclude
+    private ArchivoEntity imagenGenerada;
+
     @ManyToMany
     @JoinTable(name = "publicacion_fotos",
             joinColumns = @JoinColumn(name = "publicacion_id"),

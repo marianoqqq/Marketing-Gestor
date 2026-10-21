@@ -38,7 +38,8 @@ public class PublicacionMapper {
                 entity.getEstiloImagen(),
                 entity.getEstado(),
                 entity.getPublicadaEn(),
-                entity.getFotos().stream().map(ArchivoEntity::getId).toList()
+                entity.getFotos().stream().map(ArchivoEntity::getId).toList(),
+                entity.getImagenGenerada() != null ? entity.getImagenGenerada().getId() : null
         );
     }
 }
