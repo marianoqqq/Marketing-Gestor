@@ -16,6 +16,8 @@ public class PublicacionMapper {
         publicacion.setRed(request.getRed());
         publicacion.setFormato(request.getFormato());
         publicacion.setIndicaciones(request.getIndicaciones());
+        publicacion.setTextoImagen(request.getTextoImagen());
+        publicacion.setEstiloImagen(request.getEstiloImagen());
         return publicacion;
     }
 
@@ -31,6 +33,8 @@ public class PublicacionMapper {
                 entity.getFormato(),
                 entity.getIndicaciones(),
                 entity.getTexto(),
+                entity.getTextoImagen(),
+                entity.getEstiloImagen(),
                 entity.getEstado(),
                 entity.getPublicadaEn()
         );

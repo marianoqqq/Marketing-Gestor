@@ -22,4 +22,8 @@ public class PublicacionRequest {
     private Formato formato;
 
     private String indicaciones;
+
+    private String textoImagen;
+
+    private String estiloImagen;
 }

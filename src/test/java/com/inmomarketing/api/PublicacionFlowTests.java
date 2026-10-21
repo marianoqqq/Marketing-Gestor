@@ -47,7 +47,7 @@ class PublicacionFlowTests {
 
 	@Test
 	void flujoCompletoPublicaciones() throws Exception {
-		when(chatModel.call(anyString())).thenReturn("¡Hermoso departamento en venta! 🏡✨ #Inmuebles #Oportunidad");
+		when(chatModel.call(anyString())).thenReturn("¡Gran Oportunidad! 2 Ambientes Luminoso");
 
 		// 1. Registro y login
 		registrar("agente1@test.com", "Inmo Norte");
@@ -82,36 +82,53 @@ class PublicacionFlowTests {
 									"propiedadId": %d,
 									"red": "INSTAGRAM",
 									"formato": "IMAGEN",
-									"indicaciones": "tono juvenil y fresco"
+									"indicaciones": "tono juvenil y fresco",
+									"estiloImagen": "Flyer comercial moderno"
 								}""".formatted(propiedadId)))
 				.andExpect(status().isCreated())
 				.andExpect(jsonPath("$.estado").value("BORRADOR"))
 				.andExpect(jsonPath("$.red").value("INSTAGRAM"))
 				.andExpect(jsonPath("$.formato").value("IMAGEN"))
+				.andExpect(jsonPath("$.estiloImagen").value("Flyer comercial moderno"))
 				.andReturn().getResponse().getContentAsString();
 
 		Integer publicacionId = JsonPath.read(pubBody, "$.id");
 
-		// 4. Intentar marcar como publicada antes de generar -> 400 Bad Request
+		// 4. Probar botón "Sugerir texto para la imagen" con IA
+		mockMvc.perform(post("/api/publicaciones/%d/sugerir-texto-imagen".formatted(publicacionId))
+						.header("Authorization", "Bearer " + token1))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.textoSugerido").isNotEmpty());
+
+		// 5. El usuario edita el texto de la imagen si lo desea
+		mockMvc.perform(patch("/api/publicaciones/%d/texto-imagen".formatted(publicacionId))
+						.header("Authorization", "Bearer " + token1)
+						.param("textoImagen", "¡OPORTUNIDAD ÚNICA! 2 Ambientes"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.textoImagen").value("¡OPORTUNIDAD ÚNICA! 2 Ambientes"));
+
+		// 6. Intentar marcar como publicada antes de generar -> 400 Bad Request
 		mockMvc.perform(post("/api/publicaciones/%d/publicada".formatted(publicacionId))
 						.header("Authorization", "Bearer " + token1))
 				.andExpect(status().isBadRequest());
 
-		// 5. Generar texto con IA -> 200 y estado LISTA con texto
+		// 7. Generar texto del post con IA -> 200 y estado LISTA
+		when(chatModel.call(anyString())).thenReturn("¡Hermoso departamento en venta! 🏡✨ #Inmuebles #Oportunidad");
+
 		mockMvc.perform(post("/api/publicaciones/%d/generar".formatted(publicacionId))
 						.header("Authorization", "Bearer " + token1))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.estado").value("LISTA"))
 				.andExpect(jsonPath("$.texto").isNotEmpty());
 
-		// 6. Marcar como publicada -> 200 y estado PUBLICADA con fecha
+		// 8. Marcar como publicada -> 200 y estado PUBLICADA con fecha
 		mockMvc.perform(post("/api/publicaciones/%d/publicada".formatted(publicacionId))
 						.header("Authorization", "Bearer " + token1))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.estado").value("PUBLICADA"))
 				.andExpect(jsonPath("$.publicadaEn").isNotEmpty());
 
-		// 7. Otro usuario de otra inmobiliaria no puede acceder -> 404
+		// 9. Otro usuario de otra inmobiliaria no puede acceder -> 404
 		registrar("agente2@test.com", "Inmo Sur");
 		String token2 = loginToken("agente2@test.com");
 
@@ -119,7 +136,7 @@ class PublicacionFlowTests {
 						.header("Authorization", "Bearer " + token2))
 				.andExpect(status().isNotFound());
 
-		// 8. Eliminar publicación -> 204
+		// 10. Eliminar publicación -> 204
 		mockMvc.perform(delete("/api/publicaciones/%d".formatted(publicacionId))
 						.header("Authorization", "Bearer " + token1))
 				.andExpect(status().isNoContent());

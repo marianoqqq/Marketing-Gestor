@@ -2,6 +2,7 @@ package com.inmomarketing.api.controller;
 
 import com.inmomarketing.api.dto.request.PublicacionRequest;
 import com.inmomarketing.api.dto.response.PublicacionResponse;
+import com.inmomarketing.api.dto.response.SugerenciaTextoResponse;
 import com.inmomarketing.api.service.PublicacionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -50,5 +51,19 @@ public class PublicacionController {
     @PostMapping("/{id}/publicada")
     public ResponseEntity<PublicacionResponse> marcarPublicada(@PathVariable Long id, Principal principal) {
         return ResponseEntity.ok(publicacionService.marcarPublicada(id, principal.getName()));
+    }
+
+    @PostMapping("/{id}/sugerir-texto-imagen")
+    public ResponseEntity<SugerenciaTextoResponse> sugerirTextoImagen(@PathVariable Long id, Principal principal) {
+        return ResponseEntity.ok(publicacionService.sugerirTextoImagen(id, principal.getName()));
+    }
+
+    @PatchMapping("/{id}/texto-imagen")
+    public ResponseEntity<PublicacionResponse> actualizarTextoImagen(
+            @PathVariable Long id,
+            @RequestParam(required = false) String textoImagen,
+            @RequestParam(required = false) String estiloImagen,
+            Principal principal) {
+        return ResponseEntity.ok(publicacionService.actualizarTextoImagen(id, textoImagen, estiloImagen, principal.getName()));
     }
 }

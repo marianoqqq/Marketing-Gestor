@@ -37,6 +37,12 @@ public class PublicacionEntity {
     @Column(columnDefinition = "TEXT")
     private String texto;
 
+    @Column(name = "texto_imagen", columnDefinition = "TEXT")
+    private String textoImagen;
+
+    @Column(name = "estilo_imagen", length = 100)
+    private String estiloImagen;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 30)
     private EstadoPublicacion estado;

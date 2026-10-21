@@ -2,6 +2,7 @@ package com.inmomarketing.api.service;
 
 import com.inmomarketing.api.dto.request.PublicacionRequest;
 import com.inmomarketing.api.dto.response.PublicacionResponse;
+import com.inmomarketing.api.dto.response.SugerenciaTextoResponse;
 import com.inmomarketing.api.enums.EstadoPublicacion;
 import com.inmomarketing.api.exception.ResourceNotFoundException;
 import com.inmomarketing.api.mapper.PublicacionMapper;
@@ -105,6 +106,48 @@ public class PublicacionServiceImpl implements PublicacionService {
         return publicacionMapper.toResponse(saved);
     }
 
+    @Override
+    @Transactional
+    public SugerenciaTextoResponse sugerirTextoImagen(Long id, String userEmail) {
+        PublicacionEntity publicacion = getPublicacion(id, userEmail);
+        PropiedadEntity p = publicacion.getPropiedad();
+
+        String prompt = "Sos un redactor publicitario inmobiliario experto. "
+                + "Generá UN SOLO título o frase de gancho publicitario ultra-corto (máximo 8 palabras) "
+                + "para colocar impreso sobre la imagen publicitaria de la siguiente propiedad:\n"
+                + "Título: " + p.getTitulo() + "\n"
+                + "Tipo: " + p.getTipo() + "\n"
+                + "Operación: " + p.getOperacion() + "\n"
+                + "Precio: " + p.getPrecio() + "\n"
+                + "Ambientes: " + p.getAmbientes() + "\n"
+                + (p.getDireccion() != null ? "Dirección: " + p.getDireccion() + "\n" : "")
+                + "Respondé ÚNICAMENTE con la frase de gancho, sin comillas, sin explicaciones ni saludos. Ejemplo: '¡Gran Oportunidad! 2 Ambientes Luminoso'.";
+
+        String sugerencia = chatModel.call(prompt);
+        if (sugerencia != null) {
+            sugerencia = sugerencia.trim().replace("\"", "");
+        }
+
+        publicacion.setTextoImagen(sugerencia);
+        publicacionRepository.save(publicacion);
+
+        return new SugerenciaTextoResponse(publicacion.getId(), sugerencia);
+    }
+
+    @Override
+    @Transactional
+    public PublicacionResponse actualizarTextoImagen(Long id, String textoImagen, String estiloImagen, String userEmail) {
+        PublicacionEntity publicacion = getPublicacion(id, userEmail);
+        if (textoImagen != null) {
+            publicacion.setTextoImagen(textoImagen);
+        }
+        if (estiloImagen != null) {
+            publicacion.setEstiloImagen(estiloImagen);
+        }
+        PublicacionEntity saved = publicacionRepository.save(publicacion);
+        return publicacionMapper.toResponse(saved);
+    }
+
     private InmobiliariaEntity getInmobiliariaDelUsuario(String userEmail) {
         UserEntity user = userRepository.findUserEntityByEmail(userEmail)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario", "email", userEmail));
@@ -143,6 +186,12 @@ public class PublicacionServiceImpl implements PublicacionService {
         }
         if (publicacion.getIndicaciones() != null && !publicacion.getIndicaciones().isBlank()) {
             sb.append("Indicaciones adicionales: ").append(publicacion.getIndicaciones()).append("\n");
+        }
+        if (publicacion.getEstiloImagen() != null && !publicacion.getEstiloImagen().isBlank()) {
+            sb.append("Estilo visual preferido para la imagen: ").append(publicacion.getEstiloImagen()).append("\n");
+        }
+        if (publicacion.getTextoImagen() != null && !publicacion.getTextoImagen().isBlank()) {
+            sb.append("Texto o gancho que irá sobre la imagen: \"").append(publicacion.getTextoImagen()).append("\"\n");
         }
         return sb.toString();
     }

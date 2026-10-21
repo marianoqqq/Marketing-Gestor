@@ -21,6 +21,8 @@ public class PublicacionResponse {
     private Formato formato;
     private String indicaciones;
     private String texto;
+    private String textoImagen;
+    private String estiloImagen;
     private EstadoPublicacion estado;
     private LocalDateTime publicadaEn;
 }
