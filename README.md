@@ -6,16 +6,16 @@
 
 ## 🚀 Tecnologías
 
-* **Lenguaje:** Java 21
-* **Framework:** Spring Boot 4 (`4.0.6`)
-* **Seguridad:** Spring Security con JWT (JSON Web Tokens) Stateless
-* **Base de Datos:** PostgreSQL en la nube (**Neon**) / Soporte H2 para tests
-* **ORM:** Spring Data JPA / Hibernate
-* **Inteligencia Artificial:**
+- **Lenguaje:** Java 21
+- **Framework:** Spring Boot 4 (`4.0.6`)
+- **Seguridad:** Spring Security con JWT (JSON Web Tokens) Stateless
+- **Base de Datos:** PostgreSQL en la nube (**Neon**) / Soporte H2 para tests
+- **ORM:** Spring Data JPA / Hibernate
+- **Inteligencia Artificial:**
   * **Spring AI** (`2.0.0-RC1`)
   * **Groq** (`openai/gpt-oss-120b` / `llama-3.3-70b-versatile`) para redacción ultrarrápida de posts y sugerencia de ganchos publicitarios
   * Preparado para **OpenAI** (`GPT-Image-2.5` / `DALL-E`) para generación de flyers e imágenes
-* **Herramienta de Construcción:** Maven Wrapper (`./mvnw`)
+- **Herramienta de Construcción:** Maven Wrapper (`./mvnw`)
 
 ---
 
@@ -29,15 +29,15 @@ cd Marketing-Gestor
 
 ### 2. Configurar `application-local.properties`
 Copiá el archivo de ejemplo o creá directamente:
-`src/main/resources/application-local.properties` *(este archivo está en `.gitignore` y no se sube al repositorio)*.
+`src/main/resources/application-local.properties` *(este archivo debe estar en `.gitignore` y no subirse al repositorio)*.
 
-Pegá el siguiente contenido con las credenciales del equipo:
+Pegá el siguiente contenido reemplazando con tus credenciales:
 
 ```properties
 # ==============================================================
-# JWT Secret para entorno local
+# JWT Secret para entorno local (clave en Base64 de al menos 256 bits)
 # ==============================================================
-jwt.secret=x4yWNp54fu7sQIj/UWINGLJ31BiZB/0bOL+PJnwUPTTZB13agnGzASgfLPbNcs5olIcTOTG0Y1aE3vL5ScV99Q==
+jwt.secret=tu_jwt_secret_en_base64_aqui
 
 # ==============================================================
 # Groq (Generación de texto y copys con IA)
@@ -55,13 +55,13 @@ spring.ai.openai.chat.options.model=openai/gpt-oss-120b
 # ==============================================================
 # Base de Datos: Neon PostgreSQL (Nube)
 # ==============================================================
-spring.datasource.url=jdbc:postgresql://ep-young-mountain-b6thu86d-pooler.c-2.sa-east-1.aws.neon.tech/neondb?sslmode=require
-spring.datasource.username=neondb_owner
-spring.datasource.password=npg_RlXHqK6Vcb5a
+spring.datasource.url=jdbc:postgresql://tu-host-de-neon.aws.neon.tech/neondb?sslmode=require
+spring.datasource.username=tu_usuario
+spring.datasource.password=tu_password_aqui
 spring.datasource.driver-class-name=org.postgresql.Driver
 ```
 
-> **Nota:** Hibernate tiene activo `ddl-auto=update`, por lo que las tablas se sincronizan automáticamente con Neon al iniciar la aplicación.
+> **Nota:** Hibernate tiene activo `ddl-auto=update`, por lo que las tablas se sincronizan automáticamente con la base de datos al iniciar la aplicación.
 
 ---
 
@@ -149,8 +149,8 @@ Flujo para la creación y publicación de contenido para redes sociales:
 
 ### 👥 6. Usuarios Admin (`/api/users`)
 *Exclusivo para usuarios con rol `ROLE_ADMIN`.*
-* `POST /api/users` - Crear usuario
-* `GET /api/users` - Listar usuarios
-* `GET /api/users/{id}` - Ver usuario
-* `PUT /api/users/{id}` - Modificar usuario
-* `DELETE /api/users/{id}` - Eliminar usuario
+- `POST /api/users` - Crear usuario
+- `GET /api/users` - Listar usuarios
+- `GET /api/users/{id}` - Ver usuario
+- `PUT /api/users/{id}` - Modificar usuario
+- `DELETE /api/users/{id}` - Eliminar usuario
