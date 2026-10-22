@@ -13,6 +13,7 @@ public interface PublicacionService {
     void delete(Long id, String userEmail);
     PublicacionResponse generarTexto(Long id, String userEmail);
     PublicacionResponse marcarPublicada(Long id, String userEmail);
+    PublicacionResponse generarImagen(Long id, String userEmail);
     SugerenciaTextoResponse sugerirTextoImagen(Long id, String userEmail);
     PublicacionResponse actualizarTextoImagen(Long id, String textoImagen, String estiloImagen, String userEmail);
 }

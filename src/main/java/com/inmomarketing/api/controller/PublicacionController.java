@@ -53,6 +53,11 @@ public class PublicacionController {
         return ResponseEntity.ok(publicacionService.marcarPublicada(id, principal.getName()));
     }
 
+    @PostMapping("/{id}/generar-imagen")
+    public ResponseEntity<PublicacionResponse> generarImagen(@PathVariable Long id, Principal principal) {
+        return ResponseEntity.ok(publicacionService.generarImagen(id, principal.getName()));
+    }
+
     @PostMapping("/{id}/sugerir-texto-imagen")
     public ResponseEntity<SugerenciaTextoResponse> sugerirTextoImagen(@PathVariable Long id, Principal principal) {
         return ResponseEntity.ok(publicacionService.sugerirTextoImagen(id, principal.getName()));

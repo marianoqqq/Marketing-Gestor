@@ -4,6 +4,7 @@ import com.inmomarketing.api.dto.request.PublicacionRequest;
 import com.inmomarketing.api.dto.response.PublicacionResponse;
 import com.inmomarketing.api.dto.response.SugerenciaTextoResponse;
 import com.inmomarketing.api.enums.EstadoPublicacion;
+import com.inmomarketing.api.enums.TipoArchivo;
 import com.inmomarketing.api.exception.ResourceNotFoundException;
 import com.inmomarketing.api.mapper.PublicacionMapper;
 import com.inmomarketing.api.model.ArchivoEntity;
@@ -20,12 +21,17 @@ import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
+import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class PublicacionServiceImpl implements PublicacionService {
+
+    private static final String CARPETA_GENERADAS = "uploads/generadas/";
 
     private final PublicacionRepository publicacionRepository;
     private final PropiedadRepository propiedadRepository;
@@ -33,6 +39,7 @@ public class PublicacionServiceImpl implements PublicacionService {
     private final UserRepository userRepository;
     private final PublicacionMapper publicacionMapper;
     private final ChatModel chatModel;
+    private final OpenAiImageService openAiImageService;
 
     @Override
     @Transactional
@@ -157,6 +164,62 @@ public class PublicacionServiceImpl implements PublicacionService {
         }
         PublicacionEntity saved = publicacionRepository.save(publicacion);
         return publicacionMapper.toResponse(saved);
+    }
+
+    @Override
+    @Transactional
+    public PublicacionResponse generarImagen(Long id, String userEmail) {
+        PublicacionEntity publicacion = getPublicacion(id, userEmail);
+        if (publicacion.getEstado() == EstadoPublicacion.PUBLICADA) {
+            throw new IllegalArgumentException("La publicación ya fue publicada");
+        }
+        if (publicacion.getFotos().isEmpty()) {
+            throw new IllegalArgumentException("Tenés que elegir al menos una foto");
+        }
+
+        String nombreArchivo = "publicacion_" + publicacion.getId() + "_" + UUID.randomUUID() + ".png";
+        File destino = new File(CARPETA_GENERADAS, nombreArchivo).getAbsoluteFile();
+        destino.getParentFile().mkdirs();
+        try {
+            byte[] imagen = openAiImageService.generarImagen(publicacion.getFotos(), armarPromptImagen(publicacion));
+            Files.write(destino.toPath(), imagen);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Error al generar la imagen: " + e.getMessage());
+        }
+
+        ArchivoEntity archivo = ArchivoEntity.builder()
+                .ruta(CARPETA_GENERADAS + nombreArchivo)
+                .nombreOriginal(nombreArchivo)
+                .contentType("image/png")
+                .tipo(TipoArchivo.IMAGEN)
+                .propiedad(publicacion.getPropiedad())
+                .build();
+        publicacion.setImagenGenerada(archivoRepository.save(archivo));
+
+        PublicacionEntity saved = publicacionRepository.save(publicacion);
+        return publicacionMapper.toResponse(saved);
+    }
+
+    private String armarPromptImagen(PublicacionEntity publicacion) {
+        PropiedadEntity p = publicacion.getPropiedad();
+        StringBuilder sb = new StringBuilder();
+        sb.append("Hacé una imagen cuadrada para ").append(publicacion.getRed())
+                .append(" con las fotos de esta propiedad. Mejorá la luz y los colores pero no cambies nada de la propiedad (ni muebles, ni ventanas, ni ambientes).\n")
+                .append("Poné este texto: ").append(p.getOperacion()).append(" - ")
+                .append(p.getAmbientes()).append(" ambientes - $").append(p.getPrecio().intValue()).append("\n");
+
+        if (publicacion.getTextoImagen() != null) {
+            sb.append("Título: ").append(publicacion.getTextoImagen()).append("\n");
+        } else {
+            sb.append("Inventá un título corto\n");
+        }
+        if (publicacion.getEstiloImagen() != null) {
+            sb.append("Estilo: ").append(publicacion.getEstiloImagen()).append("\n");
+        }
+        if (publicacion.getIndicaciones() != null && !publicacion.getIndicaciones().isBlank()) {
+            sb.append("Indicaciones: ").append(publicacion.getIndicaciones()).append("\n");
+        }
+        return sb.toString();
     }
 
     private InmobiliariaEntity getInmobiliariaDelUsuario(String userEmail) {
