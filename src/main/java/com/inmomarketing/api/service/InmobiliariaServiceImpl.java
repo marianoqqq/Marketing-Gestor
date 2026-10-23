@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 @Service
 public class InmobiliariaServiceImpl implements InmobiliariaService {
@@ -41,9 +43,19 @@ public class InmobiliariaServiceImpl implements InmobiliariaService {
         return inmobiliariaMapper.toResponse(updated);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<InmobiliariaResponse> getAll() {
+        return inmobiliariaRepository.findAll()
+                .stream()
+                .map(inmobiliariaMapper::toResponse)
+                .toList();
+    }
+
     private InmobiliariaEntity getInmobiliariaDelUsuario(String userEmail) {
         UserEntity user = userRepository.findUserEntityByEmail(userEmail)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario", "email", userEmail));
+
         if (user.getInmobiliaria() == null) {
             throw new IllegalArgumentException("El usuario no pertenece a ninguna inmobiliaria");
         }
