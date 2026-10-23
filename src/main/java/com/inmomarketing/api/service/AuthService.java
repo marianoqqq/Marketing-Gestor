@@ -3,21 +3,20 @@ package com.inmomarketing.api.service;
 import com.inmomarketing.api.dto.request.AuthRequest;
 import com.inmomarketing.api.dto.request.RegisterRequest;
 import com.inmomarketing.api.dto.response.AuthResponse;
+import com.inmomarketing.api.enums.UserRole;
 import com.inmomarketing.api.enums.UserStatus;
+import com.inmomarketing.api.model.InmobiliariaEntity;
 import com.inmomarketing.api.model.UserEntity;
+import com.inmomarketing.api.repository.InmobiliariaRepository;
 import com.inmomarketing.api.repository.UserRepository;
 import com.inmomarketing.api.securityJwt.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.inmomarketing.api.enums.UserRole;
-import com.inmomarketing.api.model.InmobiliariaEntity;
-import com.inmomarketing.api.repository.InmobiliariaRepository;
 
 @RequiredArgsConstructor
 @Service
@@ -50,22 +49,30 @@ public class AuthService {
 
         userRepository.save(user);
     }
-    public UserDetails authenticate(AuthRequest input) {
+
+    @Transactional
+    public AuthResponse authenticate(AuthRequest input) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         input.getEmail(),
                         input.getPassword()
                 )
         );
-
-        return userRepository.findUserEntityByEmail(input.getEmail())
+        UserEntity user = userRepository.findUserEntityByEmail(input.getEmail())
                 .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado con el email: " + input.getEmail()));
+
+        String accessToken = jwtService.generateToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user);
+
+        user.setRefreshToken(refreshToken);
+        userRepository.save(user);
+
+        return new AuthResponse(accessToken, refreshToken);
     }
 
     @Transactional
     public AuthResponse refreshAccessToken(String refreshToken) {
         String username = jwtService.extractUsername(refreshToken);
-
         UserEntity user = userRepository.findUserEntityByEmail(username)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
@@ -85,5 +92,4 @@ public class AuthService {
 
         return new AuthResponse(newAccessToken, newRefreshToken);
     }
-
 }
