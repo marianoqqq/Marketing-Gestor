@@ -112,4 +112,24 @@ public class GlobalExceptionHandler {
                 LocalDateTime.now()
         );
     }
+
+    @ExceptionHandler(org.springframework.security.authentication.LockedException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ErrorResponse handleLockedException(org.springframework.security.authentication.LockedException ex) {
+        return new ErrorResponse(
+                HttpStatus.UNAUTHORIZED.value(),
+                "Cuenta bloqueada",
+                LocalDateTime.now()
+        );
+    }
+
+    @ExceptionHandler(org.springframework.security.authentication.DisabledException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ErrorResponse handleDisabledException(org.springframework.security.authentication.DisabledException ex) {
+        return new ErrorResponse(
+                HttpStatus.UNAUTHORIZED.value(),
+                "Cuenta deshabilitada",
+                LocalDateTime.now()
+        );
+    }
 }
