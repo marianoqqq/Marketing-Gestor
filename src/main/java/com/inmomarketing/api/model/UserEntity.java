@@ -22,6 +22,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class UserEntity implements UserDetails {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Include
@@ -85,17 +86,16 @@ public class UserEntity implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return this.status != UserStatus.BLOCKED;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return this.status != UserStatus.BLOCKED;
+        return true;
     }
 
     @Override
     public boolean isEnabled() {
         return this.status == UserStatus.ACTIVE;
     }
-
 }
