@@ -43,6 +43,8 @@
 - RF-35. El admin debe poder bloquear un usuario. Un usuario bloqueado no puede iniciar sesión ni renovar su token.
 - RF-36. El admin debe poder volver a activar un usuario bloqueado.
 
+**Pendiente:** videos y página personalizada para cada inmobiliaria.
+
 ---
 
 ## 🚀 Tecnologías
