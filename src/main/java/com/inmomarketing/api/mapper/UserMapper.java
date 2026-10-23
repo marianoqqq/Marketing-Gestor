@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class UserMapper {
-
     public UserResponse toResponse(UserEntity entity) {
         if (entity == null) {
             return null;
@@ -15,8 +14,8 @@ public class UserMapper {
         Userresponse.setId(entity.getId());
         Userresponse.setEmail(entity.getEmail());
         Userresponse.setRole(entity.getRole());
+        Userresponse.setStatus(entity.getStatus());
         Userresponse.setCreatedAt(entity.getCreatedAt());
         return Userresponse;
     }
-
 }

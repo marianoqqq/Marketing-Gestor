@@ -11,4 +11,6 @@ public interface UserService {
     List<UserResponse> getAll();
     UserResponse update(Long id, UserRequest request);
     void delete(Long id);
+    UserResponse bloquearUsuario(Long id);
+    UserResponse activarUsuario(Long id);
 }

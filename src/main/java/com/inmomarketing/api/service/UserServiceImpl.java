@@ -1,8 +1,8 @@
 package com.inmomarketing.api.service;
 
-
 import com.inmomarketing.api.dto.request.UserRequest;
 import com.inmomarketing.api.dto.response.UserResponse;
+import com.inmomarketing.api.enums.UserStatus;
 import com.inmomarketing.api.exception.ResourceNotFoundException;
 import com.inmomarketing.api.mapper.UserMapper;
 import com.inmomarketing.api.model.UserEntity;
@@ -17,10 +17,10 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
+
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
-
 
     @Transactional
     @Override
@@ -28,10 +28,8 @@ public class UserServiceImpl implements UserService {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new IllegalArgumentException("Email ya usado " + request.getEmail());
         }
-
         UserEntity user = new UserEntity();
         user.setEmail(request.getEmail());
-
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRole(request.getRole());
 
@@ -50,7 +48,6 @@ public class UserServiceImpl implements UserService {
         }
 
         user.setEmail(request.getEmail());
-
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRole(request.getRole());
 
@@ -63,7 +60,6 @@ public class UserServiceImpl implements UserService {
     public List<UserResponse> getAll(){
         return userRepository.findAll().stream().map(userMapper::toResponse).toList();
     }
-
 
     @Override
     @Transactional
@@ -79,5 +75,24 @@ public class UserServiceImpl implements UserService {
             throw new ResourceNotFoundException("Usuario", "id", id);
         }
         userRepository.deleteById(id);
+    }
+
+    @Override
+    @Transactional
+    public UserResponse bloquearUsuario(Long id) {
+        UserEntity user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario", "id", id));
+        user.setStatus(UserStatus.BLOCKED);
+        user.setRefreshToken(null);
+        return userMapper.toResponse(userRepository.save(user));
+    }
+
+    @Override
+    @Transactional
+    public UserResponse activarUsuario(Long id) {
+        UserEntity user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario", "id", id));
+        user.setStatus(UserStatus.ACTIVE);
+        return userMapper.toResponse(userRepository.save(user));
     }
 }
