@@ -4,6 +4,47 @@
 
 ---
 
+## 📋 Requisitos funcionales (MVP)
+
+- RF-01. El sistema debe permitir registrarse con nombre, email, contraseña y nombre de la inmobiliaria. Al registrarse se crea la inmobiliaria y el usuario queda asociado a ella con rol usuario.
+- RF-02. El sistema no debe permitir registrar un email que ya existe.
+- RF-03. El sistema debe exigir una contraseña de al menos 8 caracteres.
+- RF-04. El sistema debe permitir iniciar sesión con email y contraseña y devolver un token de acceso y un token de renovación.
+- RF-05. El sistema debe permitir renovar el token de acceso usando el token de renovación, sin volver a pedir la contraseña.
+- RF-06. El sistema debe rechazar con error 401 los pedidos sin token, con token vencido o con token inválido.
+- RF-07. El sistema no debe dejar iniciar sesión a un usuario bloqueado o inactivo.
+- RF-08. Cada usuario solo puede ver y modificar los datos de su propia inmobiliaria.
+- RF-09. El sistema debe permitir ver los datos de la propia inmobiliaria: nombre, teléfono, Instagram, dirección y logo.
+- RF-10. El sistema debe permitir editar esos datos. El nombre es obligatorio (hasta 50 caracteres), el teléfono hasta 30, el Instagram hasta 15 y la dirección hasta 255.
+- RF-11. Los datos de la inmobiliaria se muestran en el panel. Por ahora la IA no los usa: los textos e imágenes se arman solo con los datos de la propiedad y de la publicación.
+- RF-12. El sistema debe permitir cargar una propiedad con título, tipo (casa, departamento, PH, terreno o local), operación (venta o alquiler), estado, precio, dirección, ambientes, metros cuadrados y descripción.
+- RF-13. Son obligatorios el título (hasta 150 caracteres), el tipo, la operación y el precio. El precio y los metros cuadrados deben ser mayores a 0, y los ambientes al menos 1.
+- RF-14. El sistema debe permitir listar las propiedades de la inmobiliaria y ver el detalle de cada una.
+- RF-15. El sistema debe permitir editar una propiedad y cambiar su estado entre disponible, reservada y vendida.
+- RF-16. El sistema debe permitir borrar una propiedad.
+- RF-17. El sistema debe permitir subir una o varias fotos a una propiedad. Solo acepta JPG, PNG o WEBP, de hasta 5 MB cada una y 25 MB por envío.
+- RF-18. El sistema debe permitir listar las fotos de una propiedad y ver cada una.
+- RF-19. El sistema debe permitir crear una publicación para una propiedad, eligiendo la red (Instagram o Facebook), el formato (imagen) y, de forma opcional, indicaciones, estilo de imagen, texto para la imagen y las fotos de la propiedad a usar.
+- RF-20. Las fotos elegidas tienen que pertenecer a esa propiedad.
+- RF-21. Toda publicación nueva arranca en estado borrador.
+- RF-22. El sistema debe generar con IA el texto del post (caption con emojis y hashtags) a partir de los datos de la propiedad y las indicaciones. Al generarlo, la publicación pasa a estado lista.
+- RF-23. El sistema debe permitir volver a generar el texto mientras la publicación no esté publicada.
+- RF-24. El sistema debe sugerir con IA un texto corto para poner sobre la imagen.
+- RF-25. El sistema debe permitir cambiar a mano el texto de la imagen y el estilo.
+- RF-26. El sistema debe generar con IA una imagen cuadrada para la red elegida a partir de las fotos elegidas, con el texto de la imagen, la operación, los ambientes y el precio. Debe mejorar luz y colores sin cambiar la propiedad.
+- RF-27. Para generar la imagen, la publicación tiene que tener al menos una foto elegida y no estar publicada.
+- RF-28. La imagen generada se guarda y queda asociada a la publicación, para poder verla y descargarla.
+- RF-29. El sistema debe permitir listar las publicaciones, ver el detalle de cada una y borrarlas.
+- RF-30. El sistema debe permitir marcar una publicación como publicada, solo si está en estado lista. Se guarda la fecha y ya no se puede volver a generar.
+- RF-31. Si la IA falla o tarda demasiado, el sistema debe devolver un mensaje de error claro sin perder la publicación.
+- RF-32. Solo un usuario con rol admin puede usar las funciones de administración. Un usuario común recibe error 403.
+- RF-33. El admin debe poder listar todas las inmobiliarias de la plataforma.
+- RF-34. El admin debe poder listar, ver, crear, editar y borrar usuarios.
+- RF-35. El admin debe poder bloquear un usuario. Un usuario bloqueado no puede iniciar sesión ni renovar su token.
+- RF-36. El admin debe poder volver a activar un usuario bloqueado.
+
+---
+
 ## 🚀 Tecnologías
 
 - **Lenguaje:** Java 21
