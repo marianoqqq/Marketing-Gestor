@@ -7,9 +7,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
+import java.time.Duration;
 import java.util.Base64;
 import java.util.List;
 
@@ -38,7 +40,11 @@ public class OpenAiImageService {
                     .contentType(MediaType.parseMediaType(foto.getContentType()));
         }
 
-        String respuesta = RestClient.create().post()
+        // la imagen tarda bastante en generarse, por eso le damos 2 minutos
+        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+        factory.setReadTimeout(Duration.ofMinutes(2));
+
+        String respuesta = RestClient.builder().requestFactory(factory).build().post()
                 .uri(URL)
                 .header("Authorization", "Bearer " + apiKey)
                 .contentType(MediaType.MULTIPART_FORM_DATA)
