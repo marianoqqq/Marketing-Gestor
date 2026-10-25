@@ -270,10 +270,10 @@ En la sección **Environment Variables** del servicio en Render, agregá las sig
 | `GROQ_API_KEY` | `gsk_xxxxxxxxxxxxxxxxxxxxxx` |
 | `OPENAI_API_KEY` | `sk-proj-xxxxxxxxxxxxxxxxxxxx` *(opcional si usás imágenes)* |
 | `R2_BUCKET_NAME` | `inmo-marketing-fotos` |
-| `R2_ACCESS_KEY_ID` | `77f7ef49ef1cb68d6352e19ae89f55a0` |
-| `R2_SECRET_ACCESS_KEY` | `c85a2ced7559161a53529bd3988d452d55e4760633f5a65ffe1716a8b181bc49` |
-| `R2_ACCOUNT_ID` | `2160c0de88f09b71e959434efee8bcc2` |
-| `R2_ENDPOINT` | `https://2160c0de88f09b71e959434efee8bcc2.r2.cloudflarestorage.com` |
+| `R2_ACCESS_KEY_ID` | `tu_access_key_id_aqui` |
+| `R2_SECRET_ACCESS_KEY` | `tu_secret_access_key_aqui` |
+| `R2_ACCOUNT_ID` | `tu_account_id_aqui` |
+| `R2_ENDPOINT` | `https://<account_id>.r2.cloudflarestorage.com` |
 | `R2_PUBLIC_URL` | `https://pub-xxxx.r2.dev` *(si lo habilitaste)* |
 
 *(Nota: Render inyecta automáticamente la variable `PORT`, la cual es consumida por `server.port=${PORT:8080}` de Spring Boot).*
