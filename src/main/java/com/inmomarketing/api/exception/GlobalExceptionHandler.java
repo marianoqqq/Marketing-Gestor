@@ -104,10 +104,10 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MaxUploadSizeExceededException.class)
-    @ResponseStatus(HttpStatus.PAYLOAD_TOO_LARGE)
+    @ResponseStatus(HttpStatus.CONTENT_TOO_LARGE)
     public ErrorResponse handleMaxUploadSize(MaxUploadSizeExceededException ex) {
         return new ErrorResponse(
-                HttpStatus.PAYLOAD_TOO_LARGE.value(),
+                HttpStatus.CONTENT_TOO_LARGE.value(),
                 "El archivo supera el tamaño máximo permitido (5 MB por foto)",
                 LocalDateTime.now()
         );
