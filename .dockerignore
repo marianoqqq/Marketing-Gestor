@@ -1,0 +1,49 @@
+# Build y compilación
+target/
+build/
+*.jar
+*.war
+
+# Control de versiones
+.git/
+.gitignore
+.gitattributes
+
+# IDEs y entornos de desarrollo
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.settings/
+.project
+.classpath
+.apt_generated
+.factorypath
+.springBeans
+.sts4-cache
+.nb-gradle/
+nbproject/
+nbbuild/
+dist/
+nbdist/
+
+# Logs y temporales
+*.log
+logs/
+temp/
+tmp/
+
+# Archivos y almacenamiento local
+uploads/
+data/
+.env
+HELP.md
+
+# Configuración local sensible
+**/src/main/resources/application-local.properties
+
+# Docker files
+Dockerfile
+.dockerignore
+docker-compose*.yml
