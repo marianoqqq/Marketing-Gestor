@@ -31,8 +31,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class PublicacionServiceImpl implements PublicacionService {
 
-    private static final String CARPETA_GENERADAS = "uploads/generadas/";
-
     private final PublicacionRepository publicacionRepository;
     private final PropiedadRepository propiedadRepository;
     private final ArchivoRepository archivoRepository;
@@ -40,6 +38,7 @@ public class PublicacionServiceImpl implements PublicacionService {
     private final PublicacionMapper publicacionMapper;
     private final ChatModel chatModel;
     private final OpenAiImageService openAiImageService;
+    private final StorageService storageService;
 
     @Override
     @Transactional
@@ -178,17 +177,16 @@ public class PublicacionServiceImpl implements PublicacionService {
         }
 
         String nombreArchivo = "publicacion_" + publicacion.getId() + "_" + UUID.randomUUID() + ".png";
-        File destino = new File(CARPETA_GENERADAS, nombreArchivo).getAbsoluteFile();
-        destino.getParentFile().mkdirs();
+        String ruta;
         try {
             byte[] imagen = openAiImageService.generarImagen(publicacion.getFotos(), armarPromptImagen(publicacion));
-            Files.write(destino.toPath(), imagen);
+            ruta = storageService.guardarBytes("generadas", nombreArchivo, "image/png", imagen);
         } catch (Exception e) {
             throw new IllegalArgumentException("Error al generar la imagen: " + e.getMessage());
         }
 
         ArchivoEntity archivo = ArchivoEntity.builder()
-                .ruta(CARPETA_GENERADAS + nombreArchivo)
+                .ruta(ruta)
                 .nombreOriginal(nombreArchivo)
                 .contentType("image/png")
                 .tipo(TipoArchivo.IMAGEN)

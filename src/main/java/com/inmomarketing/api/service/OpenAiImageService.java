@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.inmomarketing.api.model.ArchivoEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
@@ -22,6 +22,7 @@ public class OpenAiImageService {
     private static final String URL = "https://api.openai.com/v1/images/edits";
 
     private final ObjectMapper objectMapper;
+    private final StorageService storageService;
 
     @Value("${openai.image.api-key:}")
     private String apiKey;
@@ -35,8 +36,14 @@ public class OpenAiImageService {
         body.part("prompt", prompt);
         body.part("size", "1024x1024");
         for (ArchivoEntity foto : fotos) {
-            body.part("image[]", new FileSystemResource(foto.getRuta()))
-                    .filename(foto.getNombreOriginal())
+            byte[] bytes = storageService.obtenerBytes(foto.getRuta());
+            ByteArrayResource resource = new ByteArrayResource(bytes) {
+                @Override
+                public String getFilename() {
+                    return foto.getNombreOriginal() != null ? foto.getNombreOriginal() : "foto.jpg";
+                }
+            };
+            body.part("image[]", resource)
                     .contentType(MediaType.parseMediaType(foto.getContentType()));
         }
 

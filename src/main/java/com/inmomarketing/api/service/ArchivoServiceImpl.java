@@ -28,13 +28,13 @@ import java.util.UUID;
 @Service
 public class ArchivoServiceImpl implements ArchivoService {
 
-    private static final String CARPETA_FOTOS = "uploads/fotos/";
     private static final List<String> FORMATOS_PERMITIDOS = List.of("image/jpeg", "image/png", "image/webp");
 
     private final ArchivoRepository archivoRepository;
     private final PropiedadRepository propiedadRepository;
     private final UserRepository userRepository;
     private final ArchivoMapper archivoMapper;
+    private final StorageService storageService;
 
     @Override
     @Transactional
@@ -47,17 +47,17 @@ public class ArchivoServiceImpl implements ArchivoService {
                 throw new IllegalArgumentException("Solo se aceptan imágenes JPG, PNG o WEBP");
             }
 
-            String nombreArchivo = "propiedad_" + propiedad.getId() + "_" + UUID.randomUUID();
-            File destino = new File(CARPETA_FOTOS, nombreArchivo).getAbsoluteFile();
-            destino.getParentFile().mkdirs();
+            String extension = obtenerExtension(foto.getOriginalFilename(), foto.getContentType());
+            String nombreArchivo = "propiedad_" + propiedad.getId() + "_" + UUID.randomUUID() + extension;
+            String ruta;
             try {
-                foto.transferTo(destino);
+                ruta = storageService.guardarArchivo("fotos", nombreArchivo, foto);
             } catch (IOException e) {
                 throw new RuntimeException("Error al guardar la foto: " + e.getMessage(), e);
             }
 
             ArchivoEntity archivo = ArchivoEntity.builder()
-                    .ruta(CARPETA_FOTOS + nombreArchivo)
+                    .ruta(ruta)
                     .nombreOriginal(foto.getOriginalFilename())
                     .contentType(foto.getContentType())
                     .tipo(TipoArchivo.FOTO_PROPIEDAD)
@@ -66,6 +66,15 @@ public class ArchivoServiceImpl implements ArchivoService {
             resultado.add(archivoMapper.toResponse(archivoRepository.save(archivo)));
         }
         return resultado;
+    }
+
+    private String obtenerExtension(String originalFilename, String contentType) {
+        if (originalFilename != null && originalFilename.contains(".")) {
+            return originalFilename.substring(originalFilename.lastIndexOf("."));
+        }
+        if ("image/png".equalsIgnoreCase(contentType)) return ".png";
+        if ("image/webp".equalsIgnoreCase(contentType)) return ".webp";
+        return ".jpg";
     }
 
     @Override

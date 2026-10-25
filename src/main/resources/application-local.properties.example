@@ -23,3 +23,14 @@ spring.datasource.url=jdbc:postgresql://ep-xxxx.sa-east-1.aws.neon.tech/neondb?s
 spring.datasource.username=neondb_owner
 spring.datasource.password=
 spring.datasource.driver-class-name=org.postgresql.Driver
+
+# ==============================================================
+# Cloudflare R2 (Almacenamiento de fotos en la nube - Opcional)
+# ==============================================================
+# cloudflare.r2.account-id=tu_account_id
+# cloudflare.r2.bucket-name=inmo-marketing-fotos
+# cloudflare.r2.endpoint=https://<account_id>.r2.cloudflarestorage.com
+# cloudflare.r2.access-key=tu_access_key_id
+# cloudflare.r2.secret-key=tu_secret_access_key
+# cloudflare.r2.public-url=https://pub-xxxx.r2.dev
+

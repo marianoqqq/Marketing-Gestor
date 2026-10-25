@@ -220,6 +220,12 @@ La aplicación parametriza todas las conexiones externas a través de variables 
 | `GROQ_API_KEY` | API Key de Groq para generación de textos de publicaciones y ganchos publicitarios con IA. | *(vacío)* | **Sí** |
 | `GROQ_MODEL` | Nombre del modelo LLM de Groq a utilizar. | `openai/gpt-oss-120b` | No |
 | `OPENAI_API_KEY` | API Key de OpenAI para generación y retoque de imágenes de propiedades. | *(vacío)* | Opcional |
+| `R2_BUCKET_NAME` | Nombre del bucket en Cloudflare R2 para almacenamiento persistente de imágenes (ej. `inmo-marketing-fotos`). | *(vacío)* | **Sí** (en Render) |
+| `R2_ACCESS_KEY_ID` | Access Key ID generado para la API de Cloudflare R2. | *(vacío)* | **Sí** (en Render) |
+| `R2_SECRET_ACCESS_KEY` | Secret Access Key generado para la API de Cloudflare R2. | *(vacío)* | **Sí** (en Render) |
+| `R2_ACCOUNT_ID` | Account ID de tu cuenta de Cloudflare. | *(vacío)* | **Sí** (en Render) |
+| `R2_ENDPOINT` | URL del endpoint S3 de Cloudflare R2 (ej. `https://<account_id>.r2.cloudflarestorage.com`). | *(calculado con account-id)* | No |
+| `R2_PUBLIC_URL` | *(Opcional)* URL pública del bucket (ej. `https://pub-xxxx.r2.dev`) para CDN directo de fotos. | *(vacío)* | Opcional |
 | `SPRING_PROFILES_ACTIVE` | Perfil activo de Spring Boot (`local`, `prod`, etc.). | `local` | No |
 
 > ⚠️ **IMPORTANTE SOBRE `DB_URL`:**
@@ -263,6 +269,12 @@ En la sección **Environment Variables** del servicio en Render, agregá las sig
 | `JWT_SECRET` | `dGhpcy1pcy1hLXNlY3VyZS1qd3Qtc2VjcmV0LWtleS1leGFtcGxlLTI1Ni1iaXRzCg==` |
 | `GROQ_API_KEY` | `gsk_xxxxxxxxxxxxxxxxxxxxxx` |
 | `OPENAI_API_KEY` | `sk-proj-xxxxxxxxxxxxxxxxxxxx` *(opcional si usás imágenes)* |
+| `R2_BUCKET_NAME` | `inmo-marketing-fotos` |
+| `R2_ACCESS_KEY_ID` | `77f7ef49ef1cb68d6352e19ae89f55a0` |
+| `R2_SECRET_ACCESS_KEY` | `c85a2ced7559161a53529bd3988d452d55e4760633f5a65ffe1716a8b181bc49` |
+| `R2_ACCOUNT_ID` | `2160c0de88f09b71e959434efee8bcc2` |
+| `R2_ENDPOINT` | `https://2160c0de88f09b71e959434efee8bcc2.r2.cloudflarestorage.com` |
+| `R2_PUBLIC_URL` | `https://pub-xxxx.r2.dev` *(si lo habilitaste)* |
 
 *(Nota: Render inyecta automáticamente la variable `PORT`, la cual es consumida por `server.port=${PORT:8080}` de Spring Boot).*
 
