@@ -1,10 +1,10 @@
 package com.inmomarketing.api.service;
 
 import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -195,20 +195,47 @@ public class StorageServiceImpl implements StorageService {
         return null;
     }
 
+    @Override
+    public boolean isR2Configurado() {
+        return r2Enabled;
+    }
+
+    @PreDestroy
+    public void close() {
+        if (s3Client != null) {
+            try {
+                s3Client.close();
+                log.info("Cliente Cloudflare R2 cerrado correctamente.");
+            } catch (Exception e) {
+                log.debug("Error cerrando cliente S3: {}", e.getMessage());
+            }
+        }
+    }
+
     private boolean esRutaLocal(String ruta) {
         return ruta != null && (ruta.startsWith("uploads/") || ruta.startsWith("uploads\\") || ruta.startsWith("./uploads"));
     }
 
     private String normalizarKey(String subcarpeta, String nombreArchivo) {
-        String sub = subcarpeta.endsWith("/") ? subcarpeta : subcarpeta + "/";
-        return sub + nombreArchivo;
+        if (subcarpeta == null || subcarpeta.isBlank()) {
+            return limpiarKey(nombreArchivo);
+        }
+        String sub = subcarpeta.trim().replace("\\", "/");
+        while (sub.startsWith("/")) {
+            sub = sub.substring(1);
+        }
+        if (!sub.endsWith("/")) {
+            sub = sub + "/";
+        }
+        return sub + limpiarKey(nombreArchivo);
     }
 
     private String limpiarKey(String ruta) {
         if (ruta == null) return "";
-        if (ruta.startsWith("/")) {
-            return ruta.substring(1);
+        String limpia = ruta.trim().replace("\\", "/");
+        while (limpia.startsWith("/")) {
+            limpia = limpia.substring(1);
         }
-        return ruta;
+        return limpia;
     }
 }

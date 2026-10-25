@@ -21,8 +21,6 @@ import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.File;
-import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;

@@ -33,5 +33,5 @@ COPY --from=builder /app/target/*.jar app.jar
 # Exponer el puerto por defecto de la aplicación
 EXPOSE 8080
 
-# Comando de inicio del contenedor
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# Comando de inicio del contenedor (con optimización de memoria para cgroups de 512MB)
+ENTRYPOINT ["java", "-XX:MaxRAMPercentage=75.0", "-jar", "app.jar"]

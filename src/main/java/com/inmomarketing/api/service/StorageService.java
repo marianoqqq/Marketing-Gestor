@@ -18,4 +18,6 @@ public interface StorageService {
     void eliminarArchivo(String ruta);
 
     String obtenerUrlPublica(String ruta);
+
+    boolean isR2Configurado();
 }
